@@ -6,15 +6,15 @@
 static bool close(float a, float b) { return std::fabs(a - b) < 1e-3f; }
 
 int main() {
-    // creation & indexing
-    Tensor t(std::vector<size_t>({2, 3}));
-    t[5] = 7;
+    // creation + indexing
+    Tensor t({2, 3});
+    t.at({1, 2}) = 7;
     assert(t[5] == 7);
+    assert(t.at({1, 2}) == 7);
     assert(t.strides()[0] == 3 && t.strides()[1] == 1);
 
-    // add/sub/mul
-    Tensor a = Tensor::ones(std::vector<size_t>({2, 2}));
-    Tensor b = Tensor::ones(std::vector<size_t>({2, 2})) * 3.0f;
+    // add / sub / mul
+    Tensor a = Tensor::ones({2, 2}), b = Tensor::ones({2, 2}) * 3.0f;
     assert((a + b)[0] == 4 && (b - a)[0] == 2 && a.mul(b)[0] == 3);
 
     // matmul known answer
@@ -25,13 +25,11 @@ int main() {
     assert(C[0] == 19 && C[1] == 22 && C[2] == 43 && C[3] == 50);
 
     // fast matmul matches naive on odd sizes
-    Tensor X = Tensor::random({130, 77}, 1);
-    Tensor Y = Tensor::random({77, 91}, 2);
-    Tensor F = Tensor::matmul(X, Y);
-    Tensor S = Tensor::matmul_naive(X, Y);
+    Tensor X = Tensor::random({130, 77}, 1), Y = Tensor::random({77, 91}, 2);
+    Tensor F = Tensor::matmul(X, Y), S = Tensor::matmul_naive(X, Y);
     for (size_t i = 0; i < F.size(); ++i) assert(close(F[i], S[i]));
 
-    // reshape & transpose
+    // reshape + transpose
     Tensor R = Tensor::random({4, 6}).reshape({2, 3, 4});
     assert(R.ndim() == 3 && R.size() == 24);
     Tensor T = A.transpose();
@@ -39,9 +37,17 @@ int main() {
 
     // errors
     bool threw = false;
-    try { a.reshape({3, 3}); } catch (const std::invalid_argument&) { threw = true; }
+    try { a + Tensor({3, 3}); } catch (const std::invalid_argument&) { threw = true; }
+    assert(threw);
+    threw = false;
+    try { Tensor({2, 3}).reshape({4, 2}); } catch (const std::invalid_argument&) { threw = true; }
+    assert(threw);
+    threw = false;
+    try { t.at({5, 0}); } catch (const std::out_of_range&) { threw = true; }
+    assert(threw);
+    threw = false;
+    try { Tensor::matmul(Tensor({2, 3}), Tensor({4, 2})); } catch (const std::invalid_argument&) { threw = true; }
     assert(threw);
 
     std::cout << "ALL TESTS PASSED\n";
-    return 0;
 }

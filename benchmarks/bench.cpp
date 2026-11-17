@@ -17,7 +17,7 @@ int main() {
     printf("%6s  %12s  %12s  %9s\n", "N", "naive(ms)", "fast(ms)", "speedup");
     for (size_t n : {256, 512, 1024}) {
         Tensor A = Tensor::random({n, n}, 1), B = Tensor::random({n, n}, 2);
-        double tn = best_ms([&]() { auto C = Tensor::matmul_naive(A, B); }, n == 512 ? 1 : 3);
+        double tn = best_ms([&]() { auto C = Tensor::matmul_naive(A, B); }, n > 512 ? 1 : 3);
         double tf = best_ms([&]() { auto C = Tensor::matmul(A, B); }, 5);
         printf("%6zu %12.2f %12.2f %8.1fx\n", n, tn, tf, tn / tf);
     }
