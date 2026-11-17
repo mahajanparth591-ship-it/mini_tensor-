@@ -7,10 +7,11 @@
 #include <random>
 #include <cmath>
 #include <iostream>
+#include <new>
 
 class Tensor {
     std::vector<size_t> shape_, strides_;
-    size_t size_;
+    size_t size_=0;
     float* data_ = nullptr;
 
     void computeStrides() {
@@ -118,6 +119,20 @@ public:
     float& operator[](size_t i) { return data_[i]; }
     const float& operator[](size_t i) const { return data_[i]; }
 
+    
+    float& at(std::initializer_list<size_t> idx) { return data_[offset(idx)]; }
+    const float& at(std::initializer_list<size_t> idx) const { return data_[offset(idx)]; }
+
+    size_t offset(std::initializer_list<size_t> idx) const {
+        if (idx.size() != shape_.size()) throw std::invalid_argument("wrong number of indices");
+        size_t off = 0, d = 0;
+        for (auto i : idx) {
+            if (i >= shape_[d]) throw std::out_of_range("index out of range");
+            off += i * strides_[d++];
+        }
+        return off;
+    }
+
     // Math operations
     Tensor operator+(const Tensor& o) const { return binary(o, 0); }
     Tensor operator-(const Tensor& o) const { return binary(o, 1); }
@@ -125,7 +140,7 @@ public:
 
     Tensor operator*(float s) const {
         Tensor r(shape_);
-        #pragma omp parallel for simd
+        #pragma omp parallel for simd if(size_ > 200000)
         for (size_t i = 0; i < size_; ++i) r.data_[i] = data_[i] * s;
         return r;
     }
