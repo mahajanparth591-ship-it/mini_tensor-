@@ -1,3 +1,6 @@
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 #include "tensor.hpp"
 #include <cassert>
 #include <cmath>

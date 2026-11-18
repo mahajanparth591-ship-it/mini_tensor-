@@ -1,3 +1,4 @@
 build/
 scratch
 *.o
+*Zone.Identifier
