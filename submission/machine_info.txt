@@ -1,0 +1,12 @@
+date: Thu Nov 19 05:23:42 UTC 2026
+commit: 84f5d438d71a1db2e039ca2c981671c9809207e7
+compiler: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+flags: -std=c++17 -O3 -DNDEBUG -march=native -fopenmp -Iinclude
+CPU(s):                                  2
+Model name:                              13th Gen Intel(R) Core(TM) i5-13420H
+Thread(s) per core:                      2
+MemTotal:        7947256 kB
+os: Ubuntu 26.04.1 LTS
+kernel: 6.18.58.1-microsoft-standard-WSL2
+governor: unavailable
+numpy: 2.3.5
